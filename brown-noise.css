@@ -1,0 +1,96 @@
+/* Brown Noise Player */
+.brown-noise-player {
+    position: absolute;
+    top: 1.5rem;
+    left: 2rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: rgba(255, 255, 255, 0.7);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    padding: 0.5rem 0.8rem;
+    border-radius: 12px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    transition: all 0.3s ease;
+}
+
+.brown-noise-player:hover {
+    box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37), 0 0 15px rgba(76, 201, 240, 0.6);
+}
+
+.noise-btn {
+    background: none;
+    border: none;
+    color: #4361ee;
+    font-size: 1.2rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+}
+
+.noise-btn:hover {
+    background-color: rgba(67, 97, 238, 0.1);
+    transform: scale(1.1);
+}
+
+.noise-btn.active {
+    color: #f72585;
+}
+
+.volume-control {
+    width: 80px;
+}
+
+.volume-control input[type="range"] {
+    width: 100%;
+    height: 5px;
+    -webkit-appearance: none;
+    appearance: none;
+    background: linear-gradient(90deg, #4361ee 50%, #e9ecef 50%);
+    border-radius: 5px;
+    outline: none;
+}
+
+.volume-control input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 15px;
+    height: 15px;
+    border-radius: 50%;
+    background: #4361ee;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.volume-control input[type="range"]::-webkit-slider-thumb:hover {
+    transform: scale(1.2);
+    background: #f72585;
+}
+
+/* Dark mode styles for brown noise player */
+body.dark-mode .brown-noise-player {
+    background: rgba(30, 30, 30, 0.7);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+body.dark-mode .noise-btn {
+    color: #bb86fc;
+}
+
+body.dark-mode .noise-btn.active {
+    color: #f72585;
+}
+
+body.dark-mode .volume-control input[type="range"] {
+    background: linear-gradient(90deg, #bb86fc 50%, #2d2d2d 50%);
+}
+
+body.dark-mode .volume-control input[type="range"]::-webkit-slider-thumb {
+    background: #bb86fc;
+}

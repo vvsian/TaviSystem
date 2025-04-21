@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Leitner System - Flashcard Study App</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="brown-noise.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+<body>
+    <div class="app-container">
+        <header>
+            <h1>Leitner System</h1>
+            <p>Efficient flashcard learning with spaced repetition</p>
+            <div class="welcome-banner" id="welcome-banner">
+                <span id="welcome-message">Welcome</span>
+            </div>
+            <!-- Brown Noise Player -->
+            <div class="brown-noise-player">
+                <button id="toggle-noise-btn" class="noise-btn" title="Toggle Brown Noise">
+                    <i class="fas fa-volume-mute"></i>
+                </button>
+                <div class="volume-control">
+                    <input type="range" id="noise-volume" min="0" max="100" value="50">
+                </div>
+            </div>
+        </header>
+
+        <div class="dashboard">
+            <div class="stats">
+                <div class="stat-item">
+                    <span class="stat-value" id="total-cards">0</span>
+                    <span class="stat-label">Total Cards</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-value" id="cards-mastered">0</span>
+                    <span class="stat-label">Mastered</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-value" id="cards-to-review">0</span>
+                    <span class="stat-label">To Review Today</span>
+                </div>
+            </div>
+            <div class="dashboard-buttons">
+                <button id="create-card-btn" class="primary-btn"><i class="fas fa-plus"></i> Create New Flashcard</button>
+                <button id="delete-all-btn" class="danger-btn"><i class="fas fa-trash-alt"></i> Delete All Data</button>
+                <button id="toggle-theme-btn" class="theme-btn"><i class="fas fa-moon"></i> Dark Mode</button>
+                <button id="open-profile-btn" class="secondary-btn"><i class="fas fa-user"></i> Profile</button>
+            </div>
+        </div>
+
+        <!-- Profile Section Modal -->
+        <div class="modal" id="profile-modal">
+            <div class="modal-content profile-modal-content">
+                <span class="close-btn">&times;</span>
+                <h2>Your Learning Profile</h2>
+                
+                <div class="profile-tabs">
+                    <button class="tab-btn active" data-tab="stats-tab"><i class="fas fa-chart-bar"></i> Stats</button>
+                    <button class="tab-btn" data-tab="time-tab"><i class="fas fa-clock"></i> Study Time</button>
+                    <button class="tab-btn" data-tab="settings-tab"><i class="fas fa-cog"></i> Settings</button>
+                </div>
+                
+                <div class="tab-content">
+                    <!-- Stats Tab -->
+                    <div class="tab-panel active" id="stats-tab">
+                        <div class="profile-stats">
+                            <div class="stats-overview">
+                                <div class="level-info-container">
+                                    <div class="level-badge">
+                                        <span id="user-level">1</span>
+                                    </div>
+                                    <div class="level-info">
+                                        <div class="level-title">
+                                            <h3>Level <span id="level-display">1</span></h3>
+                                            <span class="rank-badge" id="rank-badge">Beginner</span>
+                                        </div>
+                                        <div class="xp-progress">
+                                            <div class="progress-bar">
+                                                <div class="progress-fill" id="xp-progress-fill"></div>
+                                            </div>
+                                            <div class="xp-text">
+                                                <span id="current-xp">0</span>/<span id="xp-to-level">100</span> XP
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <h3 class="stats-section-title">Learning Performance</h3>
+                            <div class="stat-cards">
+                                <div class="stat-card">
+                                    <div class="stat-card-header">
+                                        <div class="stat-icon accuracy-icon"><i class="fas fa-bullseye"></i></div>
+                                        <div class="stat-label">Accuracy</div>
+                                    </div>
+                                    <div class="stat-value" id="accuracy-stat">0%</div>
+                                    <div class="stat-progress">
+                                        <div class="progress-bar">
+                                            <div class="progress-fill" id="accuracy-progress-fill"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="stat-card">
+                                    <div class="stat-card-header">
+                                        <div class="stat-icon correct-icon"><i class="fas fa-check-circle"></i></div>
+                                        <div class="stat-label">Correct Answers</div>
+                                    </div>
+                                    <div class="stat-value" id="total-correct-stat">0</div>
+                                </div>
+                                <div class="stat-card">
+                                    <div class="stat-card-header">
+                                        <div class="stat-icon incorrect-icon"><i class="fas fa-times-circle"></i></div>
+                                        <div class="stat-label">Incorrect Answers</div>
+                                    </div>
+                                    <div class="stat-value" id="total-incorrect-stat">0</div>
+                                </div>
+                                <div class="stat-card">
+                                    <div class="stat-card-header">
+                                        <div class="stat-icon mastered-icon"><i class="fas fa-crown"></i></div>
+                                        <div class="stat-label">Cards Mastered</div>
+                                    </div>
+                                    <div class="stat-value" id="mastered-stat">0</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Time Tracking Tab -->
+                    <div class="tab-panel" id="time-tab">
+                        <div class="time-stats">
+                            <div class="time-overview">
+                                <div class="total-time-stat">
+                                    <div class="time-icon"><i class="fas fa-hourglass-half"></i></div>
+                                    <div class="stat-value" id="total-study-time-stat">00:00:00</div>
+                                    <div class="stat-label">Total Study Time</div>
+                                </div>
+                            </div>
+                            
+                            <div class="time-goals-container">
+                                <h3 class="stats-section-title">Study Goals</h3>
+                                <div class="goals-grid">
+                                    <div class="goal-card">
+                                        <div class="goal-card-header">
+                                            <h4>Daily Goal</h4>
+                                            <div class="goal-settings-toggle" id="daily-goal-settings-toggle">
+                                                <i class="fas fa-cog"></i>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="goal-progress-container">
+                                            <div class="circular-progress" id="daily-goal-progress">
+                                                <svg viewBox="0 0 100 100">
+                                                    <circle class="progress-background" cx="50" cy="50" r="45"></circle>
+                                                    <circle class="progress-circle" id="daily-progress-circle" cx="50" cy="50" r="45"></circle>
+                                                    <text x="50" y="50" text-anchor="middle" dominant-baseline="middle" id="daily-progress-text">0%</text>
+                                                </svg>
+                                            </div>
+                                            <div class="goal-details">
+                                                <div class="goal-time">
+                                                    <span id="current-daily-time">00:00</span>/<span id="daily-goal-time">01:00</span>
+                                                </div>
+                                                <div class="goal-label">
+                                                    Today's Progress
+                                                </div>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="goal-settings" id="daily-goal-settings">
+                                            <div class="goal-input-group">
+                                                <input type="number" id="daily-goal-hours" min="0" max="24" value="1">
+                                                <label>hr</label>
+                                                <input type="number" id="daily-goal-minutes" min="0" max="59" value="0">
+                                                <label>min</label>
+                                                <button id="set-daily-goal-btn" class="secondary-btn">Set</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="goal-card">
+                                        <div class="goal-card-header">
+                                            <h4>Weekly Goal</h4>
+                                            <div class="goal-settings-toggle" id="weekly-goal-settings-toggle">
+                                                <i class="fas fa-cog"></i>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="goal-progress-container">
+                                            <div class="circular-progress" id="weekly-goal-progress">
+                                                <svg viewBox="0 0 100 100">
+                                                    <circle class="progress-background" cx="50" cy="50" r="45"></circle>
+                                                    <circle class="progress-circle" id="weekly-progress-circle" cx="50" cy="50" r="45"></circle>
+                                                    <text x="50" y="50" text-anchor="middle" dominant-baseline="middle" id="weekly-progress-text">0%</text>
+                                                </svg>
+                                            </div>
+                                            <div class="goal-details">
+                                                <div class="goal-time">
+                                                    <span id="current-weekly-time">00:00</span>/<span id="weekly-goal-time">05:00</span>
+                                                </div>
+                                                <div class="goal-label">
+                                                    This Week's Progress
+                                                </div>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="goal-settings" id="weekly-goal-settings">
+                                            <div class="goal-input-group">
+                                                <input type="number" id="weekly-goal-hours" min="0" max="168" value="5">
+                                                <label>hr</label>
+                                                <input type="number" id="weekly-goal-minutes" min="0" max="59" value="0">
+                                                <label>min</label>
+                                                <button id="set-weekly-goal-btn" class="secondary-btn">Set</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="study-history">
+                                <h3 class="stats-section-title">Recent Study Sessions</h3>
+                                <div class="history-list" id="study-history-list">
+                                    <!-- Dynamic content will be loaded here -->
+                                    <div class="no-history">No study sessions yet</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Settings Tab -->
+                    <div class="tab-panel" id="settings-tab">
+                        <div class="settings-container">
+                            <div class="setting-group">
+                                <h3 class="settings-section-title">Profile Settings</h3>
+                                <div class="setting-item">
+                                    <label for="username-input">Display Name</label>
+                                    <div class="input-with-button">
+                                        <input type="text" id="username-input" placeholder="Enter your name">
+                                        <button id="save-username-btn" class="secondary-btn">Save</button>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="setting-group">
+                                <h3 class="settings-section-title">Timer Settings</h3>
+                                <div class="setting-item">
+                                    <label for="default-timer-toggle">Enable timer by default</label>
+                                    <div class="toggle-switch">
+                                        <input type="checkbox" id="default-timer-toggle" checked>
+                                        <span class="toggle-slider"></span>
+                                    </div>
+                                </div>
+                                <div class="setting-item">
+                                    <label for="card-time-input">Seconds per card</label>
+                                    <div class="number-input-container">
+                                        <input type="number" id="card-time-input" min="5" max="120" value="30">
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="setting-group">
+                                <h3 class="settings-section-title">Data Management</h3>
+                                <div class="data-management-buttons">
+                                    <button id="export-data-btn" class="action-btn export-btn"><i class="fas fa-download"></i> Export Data</button>
+                                    <button id="import-data-btn" class="action-btn import-btn"><i class="fas fa-upload"></i> Import Data</button>
+                                </div>
+                                <input type="file" id="import-file" accept=".json" style="display: none;">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="boxes-container">
+            <div class="box" id="box-1">
+                <div class="box-header">
+                    <h2>Box 1: Daily</h2>
+                    <span class="card-count" id="box-1-count">0</span>
+                </div>
+                <div class="box-description">
+                    <p>Review these cards every day</p>
+                </div>
+                <div class="cards-container" id="box-1-cards"></div>
+                <button class="study-btn" id="study-box-1">Study Now</button>
+            </div>
+
+            <div class="box" id="box-2">
+                <div class="box-header">
+                    <h2>Box 2: Every 3 Days</h2>
+                    <span class="card-count" id="box-2-count">0</span>
+                </div>
+                <div class="box-description">
+                    <p>Review these cards every 3 days</p>
+                </div>
+                <div class="cards-container" id="box-2-cards"></div>
+                <button class="study-btn" id="study-box-2">Study Now</button>
+            </div>
+
+            <div class="box" id="box-3">
+                <div class="box-header">
+                    <h2>Box 3: Weekly</h2>
+                    <span class="card-count" id="box-3-count">0</span>
+                </div>
+                <div class="box-description">
+                    <p>Review these cards once a week</p>
+                </div>
+                <div class="cards-container" id="box-3-cards"></div>
+                <button class="study-btn" id="study-box-3">Study Now</button>
+            </div>
+        </div>
+
+        <!-- Modal for creating new flashcards -->
+        <div class="modal" id="create-card-modal">
+            <div class="modal-content">
+                <span class="close-btn">&times;</span>
+                <h2>Create New Flashcard</h2>
+                <form id="new-card-form">
+                    <div class="form-group">
+                        <label for="card-question">Question:</label>
+                        <textarea id="card-question" required></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="card-answer">Answer:</label>
+                        <textarea id="card-answer" required></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="card-category">Category (optional):</label>
+                        <input type="text" id="card-category">
+                    </div>
+                    <button type="submit" class="primary-btn">Create Flashcard</button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Modal for studying flashcards -->
+        <div class="modal" id="study-modal">
+            <div class="modal-content">
+                <span class="close-btn">&times;</span>
+                <h2 id="study-box-title">Study Box</h2>
+                <div class="study-container">
+                    <div class="study-header">
+                        <div class="study-timer-container">
+                            <div class="timer" id="card-timer">
+                                <span id="timer-display">00:00</span>
+                                <div class="timer-progress" id="timer-progress"></div>
+                            </div>
+                            <button id="toggle-timer-btn" class="timer-toggle active"><i class="fas fa-stopwatch"></i></button>
+                        </div>
+                        <div class="study-progress">
+                            <div class="progress-bar">
+                                <div class="progress-fill" id="progress-fill"></div>
+                            </div>
+                            <div class="progress-text">
+                                <span id="cards-studied">0</span> / <span id="total-study-cards">0</span> cards studied
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="flashcard-container">
+                        <div class="flashcard" id="current-card">
+                            <div class="card-front" id="card-front">
+                                <div class="card-category-tag" id="card-category-display"></div>
+                                <p id="card-question-display"></p>
+                                <div class="card-hint">Click to flip</div>
+                            </div>
+                            <div class="card-back" id="card-back">
+                                <p id="card-answer-display"></p>
+                                <div class="card-hint">Click to flip back</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="study-actions">
+                        <button id="flip-btn" class="secondary-btn"><i class="fas fa-sync-alt"></i> Flip Card</button>
+                        <div class="study-controls">
+                            <button id="incorrect-btn" class="incorrect-btn"><i class="fas fa-times"></i> Incorrect</button>
+                            <button id="skip-btn" class="skip-btn"><i class="fas fa-forward"></i> Skip</button>
+                            <button id="correct-btn" class="correct-btn"><i class="fas fa-check"></i> Correct</button>
+                        </div>
+                        <div class="study-options">
+                            <button id="exit-study-btn" class="exit-btn"><i class="fas fa-door-open"></i> Exit</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="study-complete" id="study-complete">
+                    <div class="completion-badge">
+                        <i class="fas fa-award"></i>
+                    </div>
+                    <h3>Study Session Complete!</h3>
+                    <p>You've reviewed all the cards in this box.</p>
+                    
+                    <div class="study-summary">
+                        <div class="study-time">
+                            <i class="fas fa-clock"></i>
+                            <span id="total-study-time">00:00</span>
+                            <span class="summary-label">Total Time</span>
+                        </div>
+                    </div>
+                    
+                    <div class="study-results">
+                        <div class="result-item">
+                            <span class="result-value" id="correct-count">0</span>
+                            <span class="result-label">Correct</span>
+                        </div>
+                        <div class="result-item">
+                            <span class="result-value" id="incorrect-count">0</span>
+                            <span class="result-label">Incorrect</span>
+                        </div>
+                        <div class="result-item">
+                            <span class="result-value" id="skipped-count">0</span>
+                            <span class="result-label">Skipped</span>
+                        </div>
+                    </div>
+                    
+
+                    <div class="completion-buttons">
+                        <button id="try-again-btn" class="secondary-btn"><i class="fas fa-redo"></i> Try Again</button>
+                        <button id="finish-study-btn" class="primary-btn"><i class="fas fa-check-circle"></i> Finish</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+    <script src="brown-noise.js"></script>
+</body>
+</html>
